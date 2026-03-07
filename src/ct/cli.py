@@ -219,8 +219,8 @@ def setup_cmd(
     else:
         console.print("\n  [green]All checks passed.[/green]")
 
-    # GPU compute setup
-    _setup_gpu(cfg)
+    # Cloud setup
+    _setup_cloud(cfg)
 
     # Done
     console.print()
@@ -230,15 +230,48 @@ def setup_cmd(
             "  [cyan]ct[/cyan]                      Interactive mode\n"
             '  [cyan]ct "your question"[/cyan]      Single query\n'
             "  [cyan]ct doctor[/cyan]               Full health check\n"
-            "  [cyan]ct keys[/cyan]                 Optional API keys",
+            "  [cyan]ct keys[/cyan]                 Optional API keys\n"
+            "  [cyan]ct setup-gpu[/cyan]            Switch to local GPU",
             title="[green]Quick Start[/green]",
             border_style="green",
         )
     )
 
 
+def _setup_cloud(cfg):
+    """Cloud-first setup: set cloud mode and log user in."""
+    console.print()
+    console.print(
+        Panel(
+            "Some tools like AlphaFold, ESMFold, and\n"
+            "DiffDock require GPUs to run. We can run\n"
+            "these jobs for you in the cloud.\n\n"
+            "Your account includes [bold]$10 in free\n"
+            "credits[/bold] to get started.\n\n"
+            "[dim]Prefer your own GPU? Switch anytime\n"
+            "with[/dim] [cyan]ct setup-gpu[/cyan][dim].[/dim]",
+            title="[cyan]CellType Cloud[/cyan]",
+            border_style="cyan",
+        )
+    )
+
+    cfg.set("compute.mode", "cloud")
+    cfg.set("gpu.setup_completed", True)
+    cfg.save()
+    console.print()
+
+    from ct.cloud.auth import is_logged_in
+    if not is_logged_in():
+        console.print("  Let's log you in to CellType Cloud...\n")
+        login_cmd()
+    else:
+        from ct.cloud.auth import get_user_email
+        email = get_user_email() or "unknown"
+        console.print(f"  Already logged in as [bold]{email}[/bold].")
+
+
 def _setup_gpu(cfg):
-    """GPU compute setup wizard.
+    """GPU compute setup wizard (cloud vs local choice).
 
     Flow:
       1. Ask cloud vs local

@@ -4,11 +4,11 @@ CellType Cloud authentication client.
 CLI authenticates via device authorization flow:
 1. CLI requests a session code from the gateway
 2. Opens browser to the web dashboard's /authorize-device page
-3. User approves on the web (they're already signed in via Clerk)
+3. User approves on the web (they're already signed in via WorkOS)
 4. CLI polls until approved, receives a long-lived API token
 5. Token stored at ~/.ct/auth.json
 
-The API token is tied to the user's Clerk account. Same user, same credits,
+The API token is tied to the user's WorkOS account. Same user, same credits,
 whether accessed via CLI or web dashboard.
 """
 
