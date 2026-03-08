@@ -1963,6 +1963,7 @@ def login_cmd():
         except Exception:
             pass
 
+    console.print(f"  Confirmation code: [bold cyan]{session_code}[/bold cyan]\n")
     console.print("  Waiting for authorization...")
 
     try:
