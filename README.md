@@ -1,5 +1,10 @@
 # celltype-cli
 
+> **v0.2.0 is out** — CellType Cloud, GPU-accelerated tools (ESMFold, Boltz-2, RFdiffusion, ProteinMPNN, and more). Update now:
+> ```bash
+> pip install --upgrade celltype-cli
+> ```
+
 An autonomous agent for drug discovery research. Like Claude Code, but for biology.
 
 Ask questions in natural language. celltype-cli plans the analysis, selects the right tools, executes them, validates results, and returns data-backed conclusions.
