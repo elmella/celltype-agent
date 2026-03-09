@@ -2,7 +2,7 @@
 
 > **v0.2.0 is out** — Offload GPU-accelerated tools to CellType Cloud with no additional setup. ESMFold, Boltz-2, RFdiffusion, ProteinMPNN, and more. Update now:
 > ```bash
-> pip install --upgrade celltype-cli
+> curl -fsSL https://raw.githubusercontent.com/celltype/celltype-agent/main/install.sh | bash
 > ```
 
 An autonomous agent for drug discovery research. Like Claude Code, but for biology.
