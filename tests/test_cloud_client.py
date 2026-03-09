@@ -44,7 +44,15 @@ class TestCloudClient:
             assert result["skipped"] is True
             assert result["reason"] == "insufficient_credits"
 
-    def test_prepare_tool_args_inlines_local_pdb_file(self, tmp_path):
+    @pytest.mark.parametrize(
+        ("tool_name", "arg_name"),
+        [
+            ("design.rfdiffusion", "target_pdb"),
+            ("design.proteinmpnn", "backbone_pdb"),
+            ("structure.diffdock", "protein_pdb"),
+        ],
+    )
+    def test_prepare_tool_args_inlines_local_pdb_file(self, tmp_path, tool_name, arg_name):
         from ct.cloud.client import CloudClient
 
         client = CloudClient(endpoint="http://localhost:8000")
@@ -53,12 +61,12 @@ class TestCloudClient:
         pdb_path.write_text(pdb_content, encoding="utf-8")
 
         prepared = client._prepare_tool_args(
-            "design.rfdiffusion",
-            {"target_pdb": str(pdb_path), "num_designs": 3},
+            tool_name,
+            {arg_name: str(pdb_path), "other_arg": 3},
         )
 
-        assert prepared["target_pdb"] == pdb_content
-        assert prepared["num_designs"] == 3
+        assert prepared[arg_name] == pdb_content
+        assert prepared["other_arg"] == 3
 
     def test_prepare_tool_args_keeps_inline_pdb_content(self):
         from ct.cloud.client import CloudClient

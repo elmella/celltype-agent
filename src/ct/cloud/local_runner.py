@@ -12,6 +12,8 @@ import uuid
 from pathlib import Path
 from typing import Optional
 
+from ct.cloud.structure_inputs import inline_structure_file_args
+
 logger = logging.getLogger("ct.cloud.local_runner")
 
 DEFAULT_WORKSPACE = Path.home() / ".ct" / "gpu-workspace"
@@ -194,6 +196,7 @@ class LocalRunner:
             k: v for k, v in kwargs.items()
             if not k.startswith("_")
         }
+        tool_args = inline_structure_file_args(tool.name, tool_args, logger=logger)
 
         # Write input args to workspace
         input_file = workspace / "input.json"

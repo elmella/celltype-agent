@@ -5,7 +5,7 @@ category: design
 usage_guide: Use after backbone design (RFDiffusion) to generate amino acid sequences. Lightweight GPU tool (~1GB VRAM).
 docker_image: celltype/proteinmpnn:latest
 parameters:
-  backbone_pdb: Protein backbone PDB string
+  backbone_pdb: Protein backbone structure as inline PDB/mmCIF text or a local path to a .pdb/.cif/.mmcif/.ent file
   num_sequences: 'Number of sequences to design (default: 10)'
 compute:
   requires_gpu: true

@@ -5,10 +5,11 @@ polls for status, streams progress to terminal, handles cancellation.
 
 import logging
 import time
-from pathlib import Path
 from typing import Optional
 
 import httpx
+
+from ct.cloud.structure_inputs import inline_structure_file_args
 
 logger = logging.getLogger("ct.cloud.client")
 
@@ -19,12 +20,6 @@ JOB_TIMEOUT = 600.0  # 10 minutes max
 
 class CloudClient:
     """Client for interacting with the CellType Cloud API gateway."""
-
-    _INLINE_FILE_ARG_NAMES = {
-        "target_pdb",
-        "backbone_pdb",
-        "protein_pdb",
-    }
 
     def __init__(self, endpoint: str = "https://api.celltype.com"):
         self.endpoint = endpoint.rstrip("/")
@@ -46,36 +41,10 @@ class CloudClient:
     def _prepare_tool_args(self, tool_name: str, tool_args: dict) -> dict:
         """Inline supported local file arguments before cloud submission.
 
-        Some cloud GPU tools expect the contents of a structure file, not a path
-        on the user's machine. If a known file-like argument points at a local
-        file, read it and send the file contents instead.
+        Some GPU tools accept structure text. If the caller passes a local
+        structure file path instead, inline the file contents before submission.
         """
-        prepared = dict(tool_args)
-
-        for arg_name in self._INLINE_FILE_ARG_NAMES:
-            value = prepared.get(arg_name)
-            if not isinstance(value, str):
-                continue
-            if "\n" in value or value.lstrip().startswith(("ATOM", "HEADER", "MODEL", "data_")):
-                continue
-
-            path = Path(value).expanduser()
-            if not path.is_file():
-                continue
-
-            suffix = path.suffix.lower()
-            if suffix not in {".pdb", ".cif", ".mmcif", ".ent"}:
-                continue
-
-            prepared[arg_name] = path.read_text(encoding="utf-8", errors="replace")
-            logger.info(
-                "Inlined local structure file for %s (%s=%s)",
-                tool_name,
-                arg_name,
-                path,
-            )
-
-        return prepared
+        return inline_structure_file_args(tool_name, tool_args, logger=logger)
 
     def get_balance(self, token: str) -> float:
         """Fetch the user's credit balance."""

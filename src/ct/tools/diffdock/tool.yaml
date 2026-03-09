@@ -6,7 +6,7 @@ usage_guide: Use after structure prediction to dock a compound into a protein bi
   and a ligand SMILES.
 docker_image: celltype/diffdock:latest
 parameters:
-  protein_pdb: PDB content or path to protein structure
+  protein_pdb: Protein structure as inline PDB/mmCIF text or a local path to a .pdb/.cif/.mmcif/.ent file
   ligand_smiles: SMILES string of the small molecule ligand
   num_poses: 'Number of binding poses to generate (default: 5)'
 compute:

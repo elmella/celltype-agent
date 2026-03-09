@@ -206,3 +206,30 @@ class TestLocalRunner:
         removed = runner.cleanup(max_age_hours=24)
         assert removed == 1
         assert not old_dir.exists()
+
+    @pytest.mark.parametrize(
+        ("tool_name", "arg_name"),
+        [
+            ("design.rfdiffusion", "target_pdb"),
+            ("design.proteinmpnn", "backbone_pdb"),
+            ("structure.diffdock", "protein_pdb"),
+        ],
+    )
+    def test_run_inlines_local_structure_file_args(self, tmp_path, tool_name, arg_name):
+        from ct.cloud.local_runner import LocalRunner
+
+        runner = LocalRunner(workspace=tmp_path)
+        tool = FakeTool(name=tool_name)
+        pdb_path = tmp_path / "input.pdb"
+        pdb_content = "ATOM      1  CA  ALA A   1       0.0   0.0   0.0  1.00  0.00           C\nEND\n"
+        pdb_path.write_text(pdb_content, encoding="utf-8")
+
+        with patch("ct.cloud.local_runner.subprocess.run") as mock_run:
+            inspect_result = MagicMock(returncode=0)
+            run_result = MagicMock(returncode=0, stdout="", stderr="")
+            mock_run.side_effect = [inspect_result, run_result]
+
+            runner.run(tool, **{arg_name: str(pdb_path)})
+
+        input_payload = json.loads((runner._session_dir / "input.json").read_text())
+        assert input_payload[arg_name] == pdb_content

@@ -5,7 +5,7 @@ category: design
 usage_guide: Use to design novel protein binders for a target. 2GB VRAM for small proteins, 8GB for >200 residues.
 docker_image: celltype/rfdiffusion:latest
 parameters:
-  target_pdb: Target protein PDB string
+  target_pdb: Target protein structure as inline PDB/mmCIF text or a local path to a .pdb/.cif/.mmcif/.ent file
   hotspot_residues: Optional binding site residues
   num_designs: 'Number of backbone designs (default: 5)'
 compute:
