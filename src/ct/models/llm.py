@@ -100,7 +100,7 @@ class LLMClient:
     # Default models per provider
     DEFAULT_MODELS = {
         "anthropic": "claude-opus-4-6",
-        "openai": "gpt-4o",
+        "openai": "gpt-5-codex",
         "local": None,  # User must specify
         "gluelm": None,  # CellType's own model
     }

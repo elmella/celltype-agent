@@ -131,7 +131,7 @@ def setup_cmd(
     # Azure AI Foundry: skip interactive key prompt when Foundry is configured
     if os.environ.get("ANTHROPIC_FOUNDRY_API_KEY") or os.environ.get("ANTHROPIC_FOUNDRY_RESOURCE"):
         console.print("\n  [green]Azure AI Foundry detected. No API key needed.[/green]")
-        cfg.set("llm.provider", "anthropic")
+        cfg.set("llm.provider", "openai")
         cfg.save()
         return
 
@@ -201,7 +201,7 @@ def setup_cmd(
 
     # Save
     cfg.set("llm.api_key", chosen_key)
-    cfg.set("llm.provider", "anthropic")
+    cfg.set("llm.provider", "openai")
     cfg.save()
     console.print("\n  [green]API key saved to ~/.ct/config.json[/green]")
 
@@ -424,7 +424,7 @@ def setup_gpu_cmd():
 def _prompt_api_key() -> str:
     """Prompt user for API key with masked input."""
     import getpass
-    console.print("  Get your key at: [link=https://console.anthropic.com/settings/keys]console.anthropic.com/settings/keys[/link]")
+    console.print("  Get your key at: [link=https://platform.openai.com/api-keys]platform.openai.com/api-keys[/link]")
     console.print()
     try:
         key = getpass.getpass("  Enter your Anthropic API key: ")
@@ -1917,7 +1917,7 @@ def bench(
     timeout: int = typer.Option(300, "--timeout", help="Timeout per question in seconds"),
     max_turns: int = typer.Option(15, "--max-turns", help="Max agentic loop turns"),
     model: Optional[str] = typer.Option(None, "--model", "-m", help="LLM model override"),
-    eval_model: str = typer.Option("claude-opus-4-6", "--eval-model", help="Model for LLM-as-judge evaluation"),
+    eval_model: str = typer.Option("gpt-5-codex", "--eval-model", help="Model for LLM-as-judge evaluation"),
     manifest: str = typer.Option("/mnt/bixbench/manifest.json", "--manifest", help="Path to manifest JSON"),
     output: str = typer.Option("/mnt/bixbench/outputs", "--output", "-o", help="Output directory"),
     only_failed: bool = typer.Option(False, "--only-failed", help="Re-run only failed questions"),

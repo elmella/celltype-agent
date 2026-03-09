@@ -151,7 +151,7 @@ class TestClaudeCode:
     def test_claude_not_found(self, mock_code_session):
         with patch("shutil.which", return_value=None):
             result = code(task="refactor the tests", _session=mock_code_session)
-        assert result["error"] == "claude_not_found"
+        assert result["error"] == "codex_not_found"
 
     def test_successful_invocation(self, mock_code_session):
         mock_result = MagicMock(

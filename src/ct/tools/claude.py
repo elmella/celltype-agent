@@ -1,8 +1,7 @@
-"""
-Claude reasoning tools and Claude Code integration for ct.
+"""Reasoning and coding-delegation tools for ct.
 
-Uses Claude as a reasoning engine for open-ended questions that don't fit
-pre-built tools, and delegates complex coding/editing tasks to Claude Code CLI.
+Primary naming is ``codex.*`` (OpenAI/Codex aligned). Legacy ``claude.*``
+tool names remain registered as backwards-compatible aliases.
 """
 
 import subprocess
@@ -79,8 +78,25 @@ def _build_context_section(prior_results: dict = None) -> str:
 
 
 @registry.register(
+    name="codex.reason",
+    description="Expert reasoning about drug discovery questions using Codex",
+    category="codex",
+    parameters={
+        "goal": "The question or reasoning task to address",
+        "context": "Additional context (e.g., prior findings, constraints)",
+    },
+    usage_guide=(
+        "Use when the query requires expert scientific reasoning, interpretation, "
+        "or hypothesis generation that no pre-built tool covers. Good for: "
+        "mechanism-of-action reasoning, experimental design advice, literature "
+        "interpretation, risk assessment rationale, strategic recommendations. "
+        "Do NOT use for tasks that a pre-built tool handles (data retrieval, "
+        "similarity search, etc.) — those are faster and cheaper."
+    ),
+)
+@registry.register(
     name="claude.reason",
-    description="Expert reasoning about drug discovery questions using Claude",
+    description="[alias] Expert reasoning about drug discovery questions using Codex",
     category="claude",
     parameters={
         "goal": "The question or reasoning task to address",
@@ -97,7 +113,7 @@ def _build_context_section(prior_results: dict = None) -> str:
 )
 def reason(goal: str, context: str = "", _session=None,
            _prior_results=None, **kwargs) -> dict:
-    """Use Claude for expert reasoning on drug discovery questions."""
+    """Use Codex-backed LLM reasoning on drug discovery questions."""
     if _session is None:
         return {
             "summary": "Reasoning unavailable: no active session.",
@@ -136,8 +152,24 @@ def reason(goal: str, context: str = "", _session=None,
 
 
 @registry.register(
-    name="claude.compare",
+    name="codex.compare",
     description="Compare and evaluate multiple options (compounds, targets, strategies)",
+    category="codex",
+    parameters={
+        "goal": "What to compare and the decision to make",
+        "options": "Comma-separated list of options to compare",
+        "criteria": "Evaluation criteria (optional)",
+    },
+    usage_guide=(
+        "Use when the user needs to choose between options — compounds, targets, "
+        "indications, strategies, CROs, etc. Provides structured comparison with "
+        "a recommendation. Combine with pre-built tools first to gather data, "
+        "then use codex.compare to interpret and decide."
+    ),
+)
+@registry.register(
+    name="claude.compare",
+    description="[alias] Compare and evaluate multiple options (compounds, targets, strategies)",
     category="claude",
     parameters={
         "goal": "What to compare and the decision to make",
@@ -153,7 +185,7 @@ def reason(goal: str, context: str = "", _session=None,
 )
 def compare(goal: str, options: str = "", criteria: str = "",
             _session=None, _prior_results=None, **kwargs) -> dict:
-    """Compare multiple options using Claude's reasoning."""
+    """Compare multiple options using Codex-backed reasoning."""
     if _session is None:
         return {
             "summary": "Comparison unavailable: no active session.",
@@ -194,8 +226,22 @@ def compare(goal: str, options: str = "", criteria: str = "",
 
 
 @registry.register(
-    name="claude.summarize",
+    name="codex.summarize",
     description="Synthesize and summarize research findings into actionable insights",
+    category="codex",
+    parameters={
+        "goal": "What to summarize and the intended audience/purpose",
+        "content": "Text content to summarize (optional if prior results available)",
+    },
+    usage_guide=(
+        "Use after multiple analysis steps to distill key findings. Good for: "
+        "executive summaries, decision briefs, literature synthesis. Typically "
+        "used as a final step after data-gathering tools have run."
+    ),
+)
+@registry.register(
+    name="claude.summarize",
+    description="[alias] Synthesize and summarize research findings into actionable insights",
     category="claude",
     parameters={
         "goal": "What to summarize and the intended audience/purpose",
@@ -248,8 +294,25 @@ def summarize(goal: str, content: str = "", _session=None,
 
 
 @registry.register(
+    name="codex.code",
+    description="Delegate a coding task to Codex CLI (file editing, refactoring, debugging, test writing)",
+    category="codex",
+    parameters={
+        "task": "Description of the coding task (be specific: which files, what changes, what to test)",
+        "allowed_tools": "Codex tools to allow (default: 'Read,Edit,Write,Bash,Glob,Grep')",
+        "max_budget": "Max spend in USD (default: 1.0)",
+    },
+    usage_guide=(
+        "Use for complex coding tasks that need iterative edit-test-fix cycles: "
+        "refactoring code, writing tests, debugging scripts, modifying config files, "
+        "building analysis pipelines. Codex handles the full read→edit→test→fix loop. "
+        "Do NOT use for simple single-shot file reads or edits — use files.* tools instead. "
+        "Do NOT use for drug discovery research — use ct's specialized tools."
+    ),
+)
+@registry.register(
     name="claude.code",
-    description="Delegate a coding task to Claude Code (file editing, refactoring, debugging, test writing)",
+    description="[alias] Delegate a coding task to Codex CLI (file editing, refactoring, debugging, test writing)",
     category="claude",
     parameters={
         "task": "Description of the coding task (be specific: which files, what changes, what to test)",
@@ -267,36 +330,39 @@ def summarize(goal: str, content: str = "", _session=None,
 def code(task: str, allowed_tools: str = "Read,Edit,Write,Bash,Glob,Grep",
          max_budget: float = 1.0, _session=None, _prior_results=None,
          **kwargs) -> dict:
-    """Delegate a coding task to Claude Code CLI.
+    """Delegate a coding task to Codex CLI.
 
-    Spawns `claude -p` in non-interactive mode with permission bypass and
-    a budget cap. Returns Claude Code's output as the tool result.
+    Spawns `codex -p` in non-interactive mode with permission bypass and
+    a budget cap. Returns Codex output as the tool result.
     """
     import os
     import shutil
 
-    enabled = str(os.environ.get("CT_ENABLE_CLAUDE_CODE", "")).strip().lower() in {
+    enabled = str(os.environ.get("CT_ENABLE_CODEX_CODE", "")).strip().lower() in {
         "1",
         "true",
         "yes",
     }
+    if not enabled:
+        # Legacy env var fallback
+        enabled = str(os.environ.get("CT_ENABLE_CLAUDE_CODE", "")).strip().lower() in {"1", "true", "yes"}
     if _session is not None and hasattr(_session, "config"):
         enabled = bool(_session.config.get("agent.enable_claude_code_tool", False))
 
     if not enabled:
         return {
             "summary": (
-                "claude.code is disabled by policy (opt-in). "
+                "codex.code is disabled by policy (opt-in). "
                 "Enable with: ct config set agent.enable_claude_code_tool true"
             ),
             "error": "disabled_by_policy",
         }
 
-    claude_path = shutil.which("claude")
-    if not claude_path:
+    code_cli_path = shutil.which("codex") or shutil.which("claude")
+    if not code_cli_path:
         return {
-            "summary": "Claude Code CLI not found. Install with: npm install -g @anthropic-ai/claude-code",
-            "error": "claude_not_found",
+            "summary": "Codex CLI not found. Install Codex CLI (or legacy Claude Code CLI).",
+            "error": "codex_not_found",
         }
 
     # Build context from prior results so Claude Code knows what ct has already done
@@ -319,7 +385,7 @@ def code(task: str, allowed_tools: str = "Read,Edit,Write,Bash,Glob,Grep",
         )
 
     cmd = [
-        claude_path,
+        code_cli_path,
         "-p", full_prompt,
         "--output-format", "text",
         "--permission-mode", "bypassPermissions",
@@ -349,12 +415,12 @@ def code(task: str, allowed_tools: str = "Read,Edit,Write,Bash,Glob,Grep",
             )
     except subprocess.TimeoutExpired:
         return {
-            "summary": "Claude Code timed out after 5 minutes.",
+            "summary": "Codex CLI timed out after 5 minutes.",
             "error": "timeout",
         }
     except Exception as e:
         return {
-            "summary": f"Failed to run Claude Code: {e}",
+            "summary": f"Failed to run Codex CLI: {e}",
             "error": str(e),
         }
 
@@ -376,14 +442,14 @@ def code(task: str, allowed_tools: str = "Read,Edit,Write,Bash,Glob,Grep",
         }
     elif output:
         return {
-            "summary": f"Claude Code finished (exit {result.returncode}): {output[:1000]}",
+            "summary": f"Codex CLI finished (exit {result.returncode}): {output[:1000]}",
             "full_output": output,
             "stderr": stderr[:2000] if stderr else "",
             "exit_code": result.returncode,
         }
     else:
         return {
-            "summary": f"Claude Code produced no output (exit {result.returncode}). Stderr: {stderr[:500]}",
+            "summary": f"Codex CLI produced no output (exit {result.returncode}). Stderr: {stderr[:500]}",
             "error": "no_output",
             "stderr": stderr[:2000] if stderr else "",
             "exit_code": result.returncode,

@@ -18,7 +18,7 @@ def test_load_invalid_json_does_not_crash(monkeypatch, tmp_path):
 
     cfg = Config.load()
     # Should fall back to defaults when config file is corrupt
-    assert cfg.get("llm.provider") == "anthropic"
+    assert cfg.get("llm.provider") == "openai"
 
 
 def test_llm_preflight_requires_anthropic_key(monkeypatch):
