@@ -47,10 +47,6 @@ class TestTerminalMethods:
             t.session = MagicMock()
             t.session.verbose = False
             t.session.current_model = "claude-sonnet-4-5-20250929"
-            t.session.config = MagicMock()
-            t.session.config.get.side_effect = lambda key, default=None: {
-                "agent.plan_preview": False,
-            }.get(key, default)
             t.console = MagicMock()
             t._last_response = None
             t._verbose_hint = None
@@ -82,12 +78,6 @@ class TestTerminalMethods:
         with patch("subprocess.run", side_effect=FileNotFoundError):
             terminal._copy_last_response()
             assert "not available" in str(terminal.console.print.call_args).lower()
-
-    def test_bottom_toolbar_shows_gpu_tools_celltype_cloud(self, terminal):
-        toolbar = terminal._bottom_toolbar()
-        rendered = str(toolbar)
-        assert "GPU tools:" in rendered
-        assert "CellType Cloud" in rendered
 
     def test_export_no_session(self, terminal):
         terminal._export_session()

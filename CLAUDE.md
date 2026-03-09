@@ -1,8 +1,8 @@
-# celltype-agent — Project Instructions
+# celltype-cli — Project Instructions
 
 ## What This Is
 
-celltype-agent is an autonomous agent for drug discovery research — like Claude Code, but for biology.
+celltype-cli is an autonomous agent for drug discovery research — like Claude Code, but for biology.
 It takes natural language questions about compounds/targets/indications and executes
 multi-step research workflows using computational biology tools.
 
