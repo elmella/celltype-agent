@@ -53,7 +53,6 @@ _TOOL_MODULES = (
     "cellxgene",
     "clue",
     "remote_data",
-    "alpha",
     # Container tools (esmfold, boltz2, etc.) loaded from tool.yaml by _container_tools.py
 )
 
