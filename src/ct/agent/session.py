@@ -32,7 +32,7 @@ class Session:
         """Create LLM client from config."""
         from ct.models.llm import LLMClient
 
-        provider = self.config.get("llm.provider", "anthropic")
+        provider = self.config.get("llm.provider", "openai")
         model = self.config.get("llm.model", None)
         api_key = self.config.llm_api_key(provider)
 
@@ -54,7 +54,7 @@ class Session:
         """Return the current model name."""
         if self._llm:
             return self._llm.model
-        return self.config.get("llm.model") or "claude-opus-4-6"
+        return self.config.get("llm.model") or "gpt-5-codex"
 
     def log(self, message: str):
         """Log to scratchpad (for debugging/transparency)."""

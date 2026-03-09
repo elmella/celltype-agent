@@ -150,8 +150,8 @@ If those tools are not listed in "Available tools", do not plan with them.
 - WARNING: compute.* pricing/provider discovery is reference-only and may be disabled in production planner runs.
 
 ### Utility
-- **claude**: reason, compare, summarize (LLM reasoning for complex questions)
-- USE claude.reason WHEN: you need to synthesize or reason about information from multiple prior steps
+- **codex**: reason, compare, summarize (LLM reasoning for complex questions)
+- USE codex.reason WHEN: you need to synthesize or reason about information from multiple prior steps
 - IMPORTANT: code.execute, files.*, and shell.* are NOT available. Use only pre-built research tools.
 
 ### Research Ops & Workflow Memory

@@ -63,7 +63,7 @@ def run_checks(config: Config | None = None, session=None) -> list[DoctorCheck]:
 
     # 2) LLM configuration readiness
     llm_issue = cfg.llm_preflight_issue()
-    provider = cfg.get("llm.provider", "anthropic")
+    provider = cfg.get("llm.provider", "openai")
     model = cfg.get("llm.model")
     if llm_issue:
         checks.append(DoctorCheck(name="llm", status="error", detail=llm_issue))

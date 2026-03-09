@@ -28,8 +28,8 @@ VALID_LLM_PROVIDERS = frozenset({"anthropic", "openai", "local", "gluelm"})
 logger = logging.getLogger("ct.config")
 
 DEFAULTS = {
-    "llm.provider": "anthropic",
-    "llm.model": "claude-opus-4-6",
+    "llm.provider": "openai",
+    "llm.model": "gpt-5-codex",
     "llm.api_key": None,
     "llm.openai_api_key": None,
     "llm.temperature": 0.1,
@@ -433,17 +433,17 @@ class Config:
 
     def llm_api_key(self, provider: Optional[str] = None) -> Optional[str]:
         """Get the best API key for the selected provider."""
-        provider = (provider or self.get("llm.provider", "anthropic")).lower()
+        provider = (provider or self.get("llm.provider", "openai")).lower()
         if provider == "openai":
             return self.get("llm.openai_api_key") or self.get("llm.api_key")
         return self.get("llm.api_key")
 
     def llm_preflight_issue(self) -> Optional[str]:
         """Return a human-readable LLM config issue, or None when ready."""
-        provider_raw = self.get("llm.provider", "anthropic")
+        provider_raw = self.get("llm.provider", "openai")
         provider = str(provider_raw or "").strip().lower()
         if not provider:
-            return "llm.provider is empty. Set it with: ct config set llm.provider anthropic"
+            return "llm.provider is empty. Set it with: ct config set llm.provider openai"
 
         if provider not in VALID_LLM_PROVIDERS:
             valid = ", ".join(sorted(VALID_LLM_PROVIDERS))

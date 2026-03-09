@@ -342,7 +342,7 @@ class AgentRunner:
         )
 
         # ----- Configure Agent SDK -----
-        model = config.get("llm.model") or "claude-opus-4-6"
+        model = config.get("llm.model") or "gpt-5-codex"
         max_turns = int(config.get("agent.max_sdk_turns", 30))
 
         allowed_tools = [f"mcp__ct-tools__{name}" for name in tool_names]

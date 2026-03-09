@@ -149,7 +149,7 @@ class ToolRegistry:
 
         for tool in self.list_tools():
             data_str = ", ".join(tool.requires_data) if tool.requires_data else "-"
-            if tool.name == "claude.code":
+            if tool.name in {"claude.code", "codex.code"}:
                 status = "[yellow]guarded (opt-in)[/yellow]"
             elif tool.cpu_only and tool.min_ram_gb > 0:
                 cost_str = f" ~${tool.estimated_cost:.2f}" if tool.estimated_cost else ""
