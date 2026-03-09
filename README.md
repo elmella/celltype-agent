@@ -1,11 +1,8 @@
 # celltype-cli
 
-> **v0.2.0 is out** — Offload GPU-accelerated tools to CellType Cloud with no additional setup. ESMFold, Boltz-2, RFdiffusion, ProteinMPNN, and more. Update now:
-> ```bash
-> curl -fsSL https://raw.githubusercontent.com/celltype/celltype-agent/main/install.sh | bash
-> ```
+> **v0.2.0 is out** — Offload GPU-accelerated tools to CellType Cloud with no additional setup. ESMFold, Boltz-2, RFdiffusion, ProteinMPNN, and more.
 
-An autonomous agent for drug discovery research. Like Claude Code, but for biology.
+An autonomous agent for drug discovery research. Like Codex for biology.
 
 Ask questions in natural language. celltype-cli plans the analysis, selects the right tools, executes them, validates results, and returns data-backed conclusions.
 
@@ -28,51 +25,62 @@ CellType CLI achieves **90% accuracy** on [BixBench-Verified-50](https://hugging
 ## Why ct?
 
 - **190+ drug discovery tools** — Target prioritization, compound profiling, dose-response modeling, pathway enrichment, safety assessment, clinical development, and more.
-- **Claude-powered reasoning** — Built on the Claude Agent SDK. Claude plans multi-step research workflows, calls tools, self-corrects, and synthesizes findings.
+- **OpenAI-powered reasoning** — Built for OpenAI/Codex-style agent workflows. The agent plans multi-step research workflows, calls tools, self-corrects, and synthesizes findings.
 - **Managed data pipelines** — One-command download of DepMap, PRISM, L1000, and proteomics datasets with auto-discovery loaders.
 - **30+ database APIs** — PubMed, ChEMBL, UniProt, Open Targets, ClinicalTrials.gov, Reactome, PDBe, and more — no setup required.
 - **Research UX** — Interactive terminal with @mentions, session resume, trace logging, HTML reports, and notebook export.
 - **Persistent sandbox** — Stateful Python and R execution across turns (pandas, scipy, gseapy, pydeseq2, BioPython).
 - **Open source** — MIT licensed.
 
-## Installation
+## Installation (from this repository)
 
-### Quick install
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/celltype/celltype-agent/main/install.sh | bash
-```
-
-Detects Python 3.10+, installs the latest `celltype-cli` release from PyPI via `uv`, `pipx`, or `pip`, and launches the interactive setup wizard.
-
-### Manual install
+> These instructions install and run the local repo version (not the public PyPI release).
 
 ```bash
-# With pipx (isolated environment, recommended)
-pipx install celltype-cli
+git clone https://github.com/celltype/celltype-agent.git
+cd celltype-agent
 
-# Or with pip
-pip install celltype-cli
+# Create/activate a virtual environment (recommended)
+python -m venv .venv
+source .venv/bin/activate
 
-# Or with optional scientific stacks (RDKit, scanpy, torch, etc.)
-pip install "celltype-cli[all]"
+# Install in editable mode from local source
+pip install -e .
 
-# Run the setup wizard
+# Or include all optional stacks (RDKit, scanpy, torch, etc.)
+pip install -e "[all]"
+
+# Run setup
 ct setup
 ```
 
-### Authentication
+Alternative without editable mode:
+
+```bash
+pip install .
+```
+
+### Authentication (OpenAI API key)
 
 ```bash
 # Interactive setup (recommended)
 ct setup
 
 # Or set directly
-export ANTHROPIC_API_KEY="sk-ant-..."
+export OPENAI_API_KEY="sk-..."
 
 # Non-interactive (CI/scripting)
-ct setup --api-key sk-ant-api03-...
+ct setup --api-key sk-...
 ```
+
+How to get an OpenAI API key:
+
+1. Sign in at https://chatgpt.com (your ChatGPT account is fine for identity).
+2. Open https://platform.openai.com/api-keys and create a new API key.
+3. Copy it once and save it securely (it is only shown once).
+4. Ensure your API project has billing enabled on the OpenAI Platform.
+
+> Note: ChatGPT subscription plans and API usage are billed separately; having ChatGPT Plus/Team does not automatically include API credits.
 
 ## Getting Started
 
@@ -175,7 +183,7 @@ Dark theme, responsive layout, inline CSS. No CDN, no JavaScript. Shareable via 
 | Symptom | Fix |
 |---------|-----|
 | `ct` fails at startup | `ct doctor` |
-| No API key | `ct setup` or `export ANTHROPIC_API_KEY=...` |
+| No API key | `ct setup` or `export OPENAI_API_KEY=...` |
 | Data not found | `ct data pull <dataset>` |
 | Missing dependency | `pip install "celltype-cli[all]"` |
 | Session lost | `ct --continue` (sessions auto-save) |
@@ -183,8 +191,8 @@ Dark theme, responsive layout, inline CSS. No CDN, no JavaScript. Shareable via 
 ## Contributing
 
 ```bash
-git clone https://github.com/celltype/cli.git
-cd cli
+git clone https://github.com/celltype/celltype-agent.git
+cd celltype-agent
 pip install -e ".[dev]"
 ct setup
 pytest tests/
@@ -194,7 +202,7 @@ We welcome contributions — bug reports, feature requests, documentation improv
 
 ## Enterprise & On-Premise
 
-celltype-cli is free and open source, powered by Claude out of the box.
+celltype-cli is free and open source, powered by OpenAI-compatible models out of the box.
 
 For pharma and biotech teams that need to keep data on-premise, CellType offers proprietary research agent models purpose-built to replace frontier LLMs — deployable locally behind your firewall with zero data leaving your infrastructure.
 
