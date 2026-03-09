@@ -48,7 +48,7 @@ source .venv/bin/activate
 pip install -e .
 
 # Or include all optional stacks (RDKit, scanpy, torch, etc.)
-pip install -e "[all]"
+pip install -e ".[all]"
 
 # Run setup
 ct setup
